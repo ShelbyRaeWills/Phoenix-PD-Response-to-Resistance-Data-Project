@@ -1,0 +1,3 @@
+Phoenix Police Department Response to Resistance Data is fairly new, only providing data back to 2018. It is now available on the City of Phoenix’s open data website, and is sometimes referred to as use of force data. They have five different summaries: incident details, officer summary, individual summary, race and ethnicity summary, and incident summary. I used a joined version of the data provided by Sarah Cohen, which is available upon request at srwills1@asu.edu.
+
+Data diary and other documentation available at: https://www.phoenixopendata.com/dataset/rtr & https://www.phoenixopendata.com/dataset/rtr/resource/60234beb-1b3b-4934-bcca-7933da2033da
