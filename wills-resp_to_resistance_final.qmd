@@ -1,0 +1,229 @@
+---
+title: "Response to Resistance Analysis"
+author: "Rae Wills"
+format:
+  html:
+    theme: cyborg
+    embed-resources:  true
+    toc: true
+    code-tools: true
+    df-print: paged
+editor: source
+---
+
+
+## Source Statement
+
+Phoenix Police Department Response to Resistance Data is fairly new, only providing data back to 2018. It is now available on the City of Phoenix's open data website, and is sometimes referred to as use of force data. They have five different summaries: incident details, officer summary, individual summary, race and ethnicity summary, and incident summary. I used a joined version of the data provided by Sarah Cohen, which is available upon request at <srwills1@asu.edu>.
+
+Data diary and other documentation available at:
+<https://www.phoenixopendata.com/dataset/rtr> &
+<https://www.phoenixopendata.com/dataset/rtr/resource/60234beb-1b3b-4934-bcca-7933da2033da>
+
+## Loading libraries and data
+
+```{r}
+#| label: load libraries
+
+pacman::p_load ( "tidyverse", "lubridate", "janitor")
+
+```
+
+The file individual_combined.Rds will be required to run this and is available by contacting Rae Wills at <srwills1@asu.edu>.
+
+```{r}
+#| label: load data
+
+individual_combined <-
+  readRDS ("C:/Users/doluv/OneDrive/Documents/maij-working/DataFinal/individual_combined.Rds")
+
+```
+
+## How many suspects were injured that were not armed?
+
+```{r}
+#| label: injured and unarmed
+
+individual_combined |>
+  filter(cit_injury_yn == "Yes", 
+         armed_type == "None")
+
+
+```
+Since 2018, Phoenix Police have injured 1,005 people who were unarmed. 
+
+
+
+## How many unarmed suspects were injured that did not physically resist?
+
+```{r}
+#| label: injured, unarmed and did not physically resist
+
+individual_combined |>
+  filter(cit_injury_yn == "Yes", 
+         armed_type == "None",
+         subject_resist_primary == "Passive Resistance" | subject_resist_primary == "Verbal Non-Compliance" | subject_resist_primary =="Psychological Intimidation")
+
+
+```
+Phoenix Police injured 271 unarmed people that were not physically resisting since 2018.
+
+         
+```{r}
+#| label: baby datasets
+
+unarmed_injured <-
+  individual_combined |>
+  filter(cit_injury_yn == "Yes", 
+         armed_type == "None") |>
+  select ( subject_age_group, simple_subj_re_grp, subject_gender, highest_charge, subject_resist_primary, cit_injury_yn, armed_type) |>
+  arrange(subject_age_group) 
+
+nonviolent_injured <-
+  individual_combined |>
+  filter(cit_injury_yn == "Yes", 
+         armed_type == "None",
+         subject_resist_primary == "Passive Resistance" | subject_resist_primary == "Verbal Non-Compliance" | subject_resist_primary =="Psychological Intimidation") |>
+  select ( subject_age_group, simple_subj_re_grp, subject_gender, highest_charge, subject_resist_primary, cit_injury_yn, armed_type) |>
+  arrange(subject_age_group) 
+
+
+```
+  
+
+## What is the breakdown by age?
+
+```{r}
+#| label: injured and unarmed - by age
+
+individual_combined |>
+  filter(cit_injury_yn == "Yes", 
+         armed_type == "None") |>
+  count(subject_age_group) 
+  
+
+```
+Since 2018, 73 unarmed people under the age of 20 were injured by Phoenix Police.
+Phoenix Police injured 25 unarmed people over 60 years old since 2018.
+
+
+```{r}
+#| label: injured, unarmed, and not physically resisting - by age
+
+nonviolent_injured |>
+  filter(cit_injury_yn == "Yes", 
+         armed_type == "None",
+         subject_resist_primary == "Passive Resistance" | subject_resist_primary == "Verbal Non-Compliance" | subject_resist_primary =="Psychological Intimidation") |>
+  count(subject_age_group) 
+
+```
+Since 2018, Phoenix Police have injured 9 unarmed people over the age of 60 that were not physically resisting. 
+Since 2018, Phoenix Police have injured 32 unarmed people under the age of 20 that were not physically resisting. 
+
+
+```{r}
+#| label: intersectionality age and gender
+
+nonviolent_injured |>
+  count(subject_age_group, subject_gender) 
+```
+Phoenix Police injured 25 unarmed boys under the age of 20 that were not physically resisting since 2018. 
+
+
+## What is the breakdown by race?
+
+```{r}
+#| label: injured and unarmed - by race
+
+unarmed_injured |>
+  count(simple_subj_re_grp)
+  
+
+```
+Since 2018 Phoenix police have injured 1,005 unarmed people, including 403 Hispanic people, 295 white people, and 246 Black people. 
+
+
+```{r}
+#| label: injured, unarmed, and not physically resisting - by race
+
+nonviolent_injured |>
+  count(simple_subj_re_grp) 
+
+```
+Since 2018 Phoenix police have injured 271 unarmed and people that were not physically resisting, including 116 Hispanic people, 67 white people, and 67 Black people.
+
+
+## What is the breakdown by sex?
+
+```{r}
+#| label: intersectionality - gender and race
+
+unarmed_injured |>
+  count(subject_gender, simple_subj_re_grp)
+
+```
+Phoenix police have injured 1,005 unarmed people since 2018, including 381 Hispanic men, 264 white men, and 222 Black men. 
+
+
+```{r}
+#| label: injured, unarmed, and not physically resisting - by gender and race
+
+nonviolent_injured |>
+  count(subject_gender, simple_subj_re_grp) 
+  
+```
+Phoenix police have injured 271 unarmed and people that were not physically resisting since 2018, including 109 Hispanic men, 58 white men, and 58 Black men.
+
+
+## Looking for a lede: What were the details for elderly suspects?
+
+```{r}
+#| label: 90s dude
+
+individual_combined |>
+  filter(subject_age_group == "90s" | subject_age_group == "80s" )
+
+
+```
+Last year, on a Sunday an unarmed man in his 90s was injured  on West Jefferson St. 
+
+In 2021, on a Wednesday a woman in her 80s was tased and injured on South 10th St.
+
+On a Thursday last year, police shot a man in his 80s with foam bullets leaving him injured on East Cody Drive. 
+
+
+## Looking for a lede: Which dates had the most injuries?
+
+
+```{r}
+#| label: looking for a lede - dates step 1
+individual_combined |>
+  count(incident_date) |>
+  arrange(desc(n))
+
+```
+
+## Looking for a lede: What were the details of two dates with the most injuries from last year?
+
+```{r}
+#| label: looking for a lede - dates step 2
+
+individual_combined |>
+  filter(incident_date == "2022-10-06")
+
+```
+On a single day last year, 11 unarmed people were injured by Phoenix PD. 
+
+
+```{r}
+#| label: looking for a lede - dates step 3
+
+individual_combined |>
+  filter(incident_date == "2022-08-06")
+
+```
+On a Saturday last August, 11 men were injured by police across Phoenix, 10 of which were unarmed.  
+
+
+
+
